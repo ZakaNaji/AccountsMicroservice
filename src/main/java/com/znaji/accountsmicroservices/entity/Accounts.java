@@ -13,7 +13,7 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Accounts {
+public class Accounts extends BaseEntity{
     @Id
     private Long accountNumber;
     private Long customerId;
