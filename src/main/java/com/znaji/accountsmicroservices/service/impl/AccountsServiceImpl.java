@@ -1,0 +1,60 @@
+package com.znaji.accountsmicroservices.service.impl;
+
+import com.znaji.accountsmicroservices.constants.AccountsConstants;
+import com.znaji.accountsmicroservices.dto.CustomerDto;
+import com.znaji.accountsmicroservices.entity.Accounts;
+import com.znaji.accountsmicroservices.entity.Customer;
+import com.znaji.accountsmicroservices.exception.CustomerExistAlreadyException;
+import com.znaji.accountsmicroservices.repository.AccountsRepository;
+import com.znaji.accountsmicroservices.repository.CustomerRepository;
+import com.znaji.accountsmicroservices.service.AccountsService;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.Random;
+
+@Service
+public class AccountsServiceImpl implements AccountsService {
+
+    private final AccountsRepository accountsRepository;
+    private final CustomerRepository customerRepository;
+
+    public AccountsServiceImpl(AccountsRepository accountsRepository, CustomerRepository customerRepository) {
+        this.accountsRepository = accountsRepository;
+        this.customerRepository = customerRepository;
+    }
+
+    @Override
+    public void createAccount(CustomerDto customerDto) {
+        Customer customer = CustomerMapper.toModel(customerDto);
+        Optional<Customer> existingCustomer = customerRepository.findByMobileNumber(customer.getMobileNumber());
+        if (existingCustomer.isPresent()) {
+            throw new CustomerExistAlreadyException("An account with this mobile number exist already: " + customer.getMobileNumber());
+        }
+        //setting auditing manually for now:
+        customer.setCreatedAt(LocalDateTime.now());
+        customer.setCreatedBy("Annon");
+
+        Customer savedCustomer = customerRepository.save(customer);
+
+        Accounts newAccount = createNewAccount(savedCustomer);
+        accountsRepository.save(newAccount);
+    }
+
+    private Accounts createNewAccount(Customer customer) {
+        Accounts accounts = new Accounts();
+        long accountNumber = 1000000000L + new Random().nextInt(90000000);
+
+        accounts.setAccountNumber(accountNumber);
+        accounts.setCustomerId(customer.getCustomerId());
+        accounts.setAccountType(AccountsConstants.SAVING);
+        accounts.setBranchAddress(AccountsConstants.ADDRESS);
+
+        //setting auditing manually for now:
+        accounts.setCreatedAt(LocalDateTime.now());
+        accounts.setCreatedBy("Annon");
+
+        return accounts;
+    }
+}
