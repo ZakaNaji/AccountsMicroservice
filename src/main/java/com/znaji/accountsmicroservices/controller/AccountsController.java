@@ -7,10 +7,7 @@ import com.znaji.accountsmicroservices.service.AccountsService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController()
 @RequestMapping(value = "/api", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -29,5 +26,11 @@ public class AccountsController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new ResponseDto(AccountsConstants.STATUS_201, AccountsConstants.MESSAGE_201));
+    }
+
+    @GetMapping("/fetch")
+    public ResponseEntity<CustomerDto> fetchCustomerDetail(@RequestParam("mobileNumber") String mobileNumber) {
+        CustomerDto customerDto = accountsService.fetchCustomerDetails(mobileNumber);
+        return ResponseEntity.ok(customerDto);
     }
 }

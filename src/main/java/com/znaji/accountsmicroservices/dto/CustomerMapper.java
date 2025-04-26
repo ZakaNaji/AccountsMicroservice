@@ -1,4 +1,4 @@
-package com.znaji.accountsmicroservices.service.impl;
+package com.znaji.accountsmicroservices.dto;
 
 import com.znaji.accountsmicroservices.dto.CustomerDto;
 import com.znaji.accountsmicroservices.entity.Accounts;
@@ -14,5 +14,13 @@ public class CustomerMapper {
         customer.setEmail(dto.getEmail());
         customer.setMobileNumber(dto.getMobileNumber());
         return customer;
+    }
+
+    public static CustomerDto toDto(Customer customer) {
+        CustomerDto customerDto = new CustomerDto();
+        customerDto.setName(customer.getName());
+        customerDto.setEmail(customer.getEmail());
+        customerDto.setMobileNumber(customer.getMobileNumber());
+        return customerDto;
     }
 }

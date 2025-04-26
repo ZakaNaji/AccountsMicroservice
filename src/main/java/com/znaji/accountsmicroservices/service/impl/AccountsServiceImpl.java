@@ -1,10 +1,13 @@
 package com.znaji.accountsmicroservices.service.impl;
 
 import com.znaji.accountsmicroservices.constants.AccountsConstants;
+import com.znaji.accountsmicroservices.dto.AccountsMapper;
 import com.znaji.accountsmicroservices.dto.CustomerDto;
+import com.znaji.accountsmicroservices.dto.CustomerMapper;
 import com.znaji.accountsmicroservices.entity.Accounts;
 import com.znaji.accountsmicroservices.entity.Customer;
 import com.znaji.accountsmicroservices.exception.CustomerExistAlreadyException;
+import com.znaji.accountsmicroservices.exception.ResourceNotFound;
 import com.znaji.accountsmicroservices.repository.AccountsRepository;
 import com.znaji.accountsmicroservices.repository.CustomerRepository;
 import com.znaji.accountsmicroservices.service.AccountsService;
@@ -40,6 +43,18 @@ public class AccountsServiceImpl implements AccountsService {
 
         Accounts newAccount = createNewAccount(savedCustomer);
         accountsRepository.save(newAccount);
+    }
+
+    @Override
+    public CustomerDto fetchCustomerDetails(String mobileNumber) {
+        Customer customer = customerRepository.findByMobileNumber(mobileNumber)
+                .orElseThrow(() -> new ResourceNotFound("Customer", "mobileNumber", mobileNumber));
+        Accounts accounts = accountsRepository.findByCustomerId(customer.getCustomerId())
+                .orElseThrow(() -> new ResourceNotFound("Accounts", "CustomerId", customer.getCustomerId().toString()));
+
+        CustomerDto customerDto = CustomerMapper.toDto(customer);
+        customerDto.setAccountsDto(AccountsMapper.toDto(accounts));
+        return customerDto;
     }
 
     private Accounts createNewAccount(Customer customer) {
