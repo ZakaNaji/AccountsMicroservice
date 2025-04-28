@@ -1,4 +1,4 @@
-package com.znaji.accountsmicroservices;
+package com.znaji.accountsmicroservices.audit;
 
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
